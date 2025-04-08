@@ -7,6 +7,7 @@ We plan to support new versions of ScanImage scans as our lab starts using them.
 
 ### Installation
 ```shell
+pip3 uninstall scanread -y
 pip3 install git+https://github.com/reimerlab/scanreader
 ```
 
