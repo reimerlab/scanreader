@@ -87,8 +87,12 @@ class ROI:
 
             else: # interpolate between scanfields
                 scanfield_depths = [sf.depth for sf in self.scanfields]
-                valid_range = range(min(scanfield_depths), max(scanfield_depths) + 1)
-                if scanning_depth in valid_range:
+                ## fix the integer issue
+                # valid_range = range(min(scanfield_depths), max(scanfield_depths) + 1)
+                # if scanning_depth in valid_range:
+                min_d = min(scanfield_depths)
+                max_d = max(scanfield_depths)
+                if min_d <= scanning_depth <= max_d:
                     field = Field()
 
                     scanfield_heights = [sf.height for sf in self.scanfields]
