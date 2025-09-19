@@ -64,7 +64,7 @@ class ROI:
         desired depth.
 
         Args:
-            scanning_depth: An integer. Depth at which we want to obtain the field.
+            scanning_depth: An integer or a float. Depth at which we want to obtain the field.
 
         Returns:
             field. A Field object, the desired field at scanning_depth
