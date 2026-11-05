@@ -213,7 +213,19 @@ class BaseScan():
     # Properties from here on are not strictly necessary
     @property
     def fps(self):
-        match = re.search(r'hRoiManager\.scanVolumeRate = (?P<fps>.*)',self.header)
+        """ Sampling rate (Hz) of each field: the volume rate.
+
+        Exception: a slow stack (fastZ disabled) that recorded a single depth. ScanImage still
+        writes scanVolumeRate = scanFrameRate / hStackManager.numSlices, using the slices set in
+        the stack manager even though only one depth was acquired (e.g. numSlices left at 4,
+        framesPerSlice larger than the frames recorded), so the volume rate is numSlices times too
+        low. Every frame of such a scan is at that one depth: use the frame rate (in multiROI
+        scans, one frame is one pass over all fields at the depth).
+        """
+        if self.is_slow_stack and self.num_scanning_depths == 1:
+            match = re.search(r'hRoiManager\.scanFrameRate = (?P<fps>.*)', self.header)
+        else:
+            match = re.search(r'hRoiManager\.scanVolumeRate = (?P<fps>.*)', self.header)
         fps = float(match.group('fps')) if match else None
         return fps
 
