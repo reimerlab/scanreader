@@ -144,7 +144,13 @@ class BaseScan():
              match = re.search(r'hStackManager\.framesPerSlice = (?P<num_frames>.*)',
                               self.header)
         else:
-            match = re.search(r'hFastZ\.numVolumes = (?P<num_frames>.*)', self.header)
+            # Some ScanImage builds tag the header VERSION_MAJOR = '5.7' (so they dispatch to
+            # Scan5Point7, not Scan2023) but no longer write hFastZ.numVolumes; the volume count
+            # is in hStackManager.numVolumes instead (R2P3 free ScanImage, since 2026-09).
+            # Without this fallback this returns None and ScanInfo.make fails with MySQL 1364
+            # "Field 'nframes_requested' doesn't have a default value". Both keys count volumes.
+            match = (re.search(r'hFastZ\.numVolumes = (?P<num_frames>.*)', self.header) or
+                     re.search(r'hStackManager\.numVolumes = (?P<num_frames>.*)', self.header))
         num_requested_frames = int(1e9 if match.group('num_frames')=='Inf' else
                                    float(match.group('num_frames'))) if match else None
         return num_requested_frames
